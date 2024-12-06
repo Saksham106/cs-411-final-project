@@ -1,0 +1,9 @@
+had to create a python venv called "weather-app"
+Made a docker image with the same name
+
+Get method to get weather of a city
+
+Post method to add a city to the favorites list
+
+Display all favorites / see weather of favorite citys
+- For each city, display the weather
