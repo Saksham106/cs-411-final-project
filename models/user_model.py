@@ -8,18 +8,49 @@ import hashlib
 logger = logging.getLogger(__name__)
 logging.basicConfig(level=logging.INFO)
 
+
 @dataclass
 class User:
+    """Represents a user in the system.
+
+    Attributes:
+        id (int): The unique identifier for the user.
+        username (str): The username chosen by the user.
+        password (str): The user's hashed password.
+    """
     id: int
     username: str
     password: str
 
+
 def get_db_connection():
+    """Create and return a connection to the SQLite database.
+
+    Uses the `DB_PATH` environment variable to determine the database location. 
+    The connection returned has its `row_factory` set to `sqlite3.Row` to allow 
+    accessing columns by name.
+
+    Returns:
+        sqlite3.Connection: A connection to the SQLite database.
+    """
     conn = sqlite3.connect(os.getenv('DB_PATH'))
     conn.row_factory = sqlite3.Row
     return conn
 
+
 def create_account(username: str, password: str) -> None:
+    """Create a new user account with the given username and password.
+
+    The password is hashed using SHA-256 before storing it in the database.
+
+    Args:
+        username (str): The desired username for the new account.
+        password (str): The plaintext password for the new account.
+
+    Raises:
+        ValueError: If the username already exists.
+        sqlite3.Error: If a database error occurs.
+    """
     hashed_password = hashlib.sha256(password.encode()).hexdigest()
     try:
         with get_db_connection() as conn:
@@ -37,7 +68,22 @@ def create_account(username: str, password: str) -> None:
         logger.error("Database error: %s", str(e))
         raise e
 
+
 def login(username: str, password: str) -> bool:
+    """Attempt to log in a user with the provided credentials.
+
+    The provided password is hashed and compared against the stored hash.
+
+    Args:
+        username (str): The username of the account.
+        password (str): The plaintext password for the account.
+
+    Returns:
+        bool: True if the login is successful, False otherwise.
+
+    Raises:
+        sqlite3.Error: If a database error occurs.
+    """
     hashed_password = hashlib.sha256(password.encode()).hexdigest()
     try:
         with get_db_connection() as conn:
@@ -54,7 +100,19 @@ def login(username: str, password: str) -> bool:
         logger.error("Database error: %s", str(e))
         raise e
 
+
 def update_password(username: str, old_password: str, new_password: str) -> None:
+    """Update the password for a given user if the old password is correct.
+
+    Args:
+        username (str): The username of the account.
+        old_password (str): The user's current plaintext password.
+        new_password (str): The user's desired new plaintext password.
+
+    Raises:
+        ValueError: If the provided old password is invalid or the username does not exist.
+        sqlite3.Error: If a database error occurs.
+    """
     hashed_old_password = hashlib.sha256(old_password.encode()).hexdigest()
     hashed_new_password = hashlib.sha256(new_password.encode()).hexdigest()
     try:
