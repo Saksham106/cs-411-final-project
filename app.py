@@ -17,14 +17,21 @@ Attributes:
 """
 
 from flask import Flask, jsonify, make_response, Response, request
-import requests
-from dotenv import load_dotenv
 import os
 import hashlib
 import sqlite3
 import json
+from dotenv import load_dotenv
 
 from models.user_model import create_account, login, update_password
+from models.weather_model import (
+    fetch_weather_data,
+    get_current_conditions,
+    get_week_average_temp,
+    get_max_temp_day,
+    get_min_temp_day,
+    get_highest_precip_day
+)
 
 # Load environment variables from .env file
 load_dotenv()
@@ -51,139 +58,56 @@ def call_api(city):
         dict: A dictionary containing weather data for the specified city,
         or a JSON error response.
     """
-    weather_api_key = os.getenv('WEATHER_API_KEY')
-    api_url = f"https://weather.visualcrossing.com/VisualCrossingWebServices/rest/services/timeline/{city}/next7days?unitGroup=us&include=days%2Ccurrent%2Cevents&key={weather_api_key}&contentType=json"
     try:
-        response = requests.get(api_url)
-        response.raise_for_status()
-
-        response_data = response.json()
-        write_data_to_json_file(response_data, 'weather_data.json')
-        return response_data
-    except requests.exceptions.HTTPError as http_err:
-        return jsonify({"error": str(http_err)}), response.status_code
-    except Exception as err:
+        response_data = fetch_weather_data(city)
+        return jsonify(response_data)
+    except ValueError as err:
         return jsonify({"error": str(err)}), 500
 
-def write_data_to_json_file(data, filename):
-    """Example function with types documented in the docstring.
-
-    Args:
-        data (dict): The data to write to a file.
-        filename (str): The name of the file where data will be written.
-
-    Returns:
-        None
-    """
-    with open(filename, 'w') as f:
-        json.dump(data, f, indent=4)
-
-def load_weather_data(city):
-    """Example function with types documented in the docstring.
-
-    Args:
-        city (str): The city for which to load weather data.
-
-    Returns:
-        dict: The weather data dictionary loaded from file or retrieved from API.
-    """
-    filename = 'weather_data.json'
-    if not os.path.exists(filename) or os.path.getsize(filename) == 0:
-        call_api(city)
-    with open(filename, 'r') as f:
-        data = json.load(f)
-    return data
-
 @app.route('/api/<city>/current-conditions', methods=['GET'])
-def get_current_conditions(city):
-    """Example function with types documented in the docstring.
-
-    Args:
-        city (str): The city for which to retrieve current weather conditions.
-
-    Returns:
-        dict: A dictionary containing the current weather conditions.
-    """
-    data = load_weather_data(city)
-    current_conditions = data.get('currentConditions', {})
-    return jsonify(current_conditions)
+def current_conditions(city):
+    """Get the current weather conditions for a given city."""
+    try:
+        current_conditions = get_current_conditions(city)
+        return jsonify(current_conditions)
+    except ValueError as err:
+        return jsonify({"error": str(err)}), 500
 
 @app.route('/api/<city>/week-average-temp', methods=['GET'])
-def get_week_average_temp(city):
-    """Example function with types documented in the docstring.
-
-    Args:
-        city (str): The city for which to calculate the weekly average temperature.
-
-    Returns:
-        dict: A dictionary with the key 'week_average_temp' containing the average temperature.
-    """
-    data = load_weather_data(city)
-    days = data.get('days', [])
-    if not days:
-        return jsonify({"error": "No day data available"}), 404
-
-    temps = [day.get('temp', 0) for day in days if 'temp' in day]
-    if not temps:
-        return jsonify({"error": "No temperature data available"}), 404
-
-    avg_temp = sum(temps) / len(temps)
-    return jsonify({"week_average_temp": avg_temp})
+def week_average_temp(city):
+    """Calculate the weekly average temperature for a given city."""
+    try:
+        average_temp = get_week_average_temp(city)
+        return jsonify({"week_average_temp": average_temp})
+    except ValueError as err:
+        return jsonify({"error": str(err)}), 500
 
 @app.route('/api/<city>/max-temp-day', methods=['GET'])
-def get_max_temp_day(city):
-    """Example function with types documented in the docstring.
-
-    Args:
-        city (str): The city for which to determine the day with the highest maximum temperature.
-
-    Returns:
-        dict: A dictionary representing the day with the highest max temperature.
-    """
-    data = load_weather_data(city)
-    days = data.get('days', [])
-    if not days:
-        return jsonify({"error": "No day data available"}), 404
-
-    max_day = max(days, key=lambda d: d.get('tempmax', float('-inf')))
-    return jsonify(max_day)
+def max_temp_day(city):
+    """Determine the day with the highest maximum temperature for a given city."""
+    try:
+        max_day = get_max_temp_day(city)
+        return jsonify(max_day)
+    except ValueError as err:
+        return jsonify({"error": str(err)}), 500
 
 @app.route('/api/<city>/min-temp-day', methods=['GET'])
-def get_min_temp_day(city):
-    """Example function with types documented in the docstring.
-
-    Args:
-        city (str): The city for which to determine the day with the lowest minimum temperature.
-
-    Returns:
-        dict: A dictionary representing the day with the lowest min temperature.
-    """
-    data = load_weather_data(city)
-    days = data.get('days', [])
-    if not days:
-        return jsonify({"error": "No day data available"}), 404
-
-    min_day = min(days, key=lambda d: d.get('tempmin', float('inf')))
-    return jsonify(min_day)
+def min_temp_day(city):
+    """Determine the day with the lowest minimum temperature for a given city."""
+    try:
+        min_day = get_min_temp_day(city)
+        return jsonify(min_day)
+    except ValueError as err:
+        return jsonify({"error": str(err)}), 500
 
 @app.route('/api/<city>/highest-precip-day', methods=['GET'])
-def get_highest_precip_day(city):
-    """Example function with types documented in the docstring.
-
-    Args:
-        city (str): The city for which to determine the day with the highest precipitation probability.
-
-    Returns:
-        dict: A dictionary representing the day with the highest precipitation probability.
-    """
-    data = load_weather_data(city)
-    days = data.get('days', [])
-    if not days:
-        return jsonify({"error": "No day data available"}), 404
-
-    highest_precip_day = max(days, key=lambda d: d.get('precipprob', 0))
-    return jsonify(highest_precip_day)
-
+def highest_precip_day(city):
+    """Determine the day with the highest precipitation probability for a given city."""
+    try:
+        highest_precip_day = get_highest_precip_day(city)
+        return jsonify(highest_precip_day)
+    except ValueError as err:
+        return jsonify({"error": str(err)}), 500
 
 @app.route('/api/health', methods=['GET'])
 def healthcheck() -> Response:
@@ -195,7 +119,6 @@ def healthcheck() -> Response:
     """
     app.logger.info('Health check')
     return make_response(jsonify({'status': 'healthy'}), 200)
-
 
 @app.route('/api/create-account', methods=['POST'])
 def create_account_route() -> Response:
@@ -220,7 +143,6 @@ def create_account_route() -> Response:
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
-
 @app.route('/api/login', methods=['POST'])
 def login_route() -> Response:
     """
@@ -243,7 +165,6 @@ def login_route() -> Response:
             return jsonify({"error": "Invalid username or password"}), 401
     except Exception as e:
         return jsonify({"error": str(e)}), 500
-
 
 @app.route('/api/update-password', methods=['POST'])
 def update_password_route() -> Response:
@@ -268,7 +189,6 @@ def update_password_route() -> Response:
         return jsonify({"error": str(e)}), 401
     except Exception as e:
         return jsonify({"error": str(e)}), 500
-    
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5002)
