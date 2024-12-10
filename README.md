@@ -18,11 +18,11 @@ The API is containerized using Docker and stores user and location data in SQLit
 
 1. **Build the Docker Image:**
     ```bash
-    docker build -t flask-weather-api .
+    docker build -t weather-app
     ```
 2. **Run the Docker Container:**
     ```bash
-    docker run -p 5002:5002 flask-weather-api
+    docker run -d -p 5002:5002 --env-file .env weather-app
     ```
 
 ### **Without Docker**
@@ -62,7 +62,7 @@ The API is containerized using Docker and stores user and location data in SQLit
 
 ---
 
-### /api/<city>
+### **/api/<city>**
 
 -   **Request Type:** `GET`
 -   **Purpose:** Fetches weather data for the specified city from the Visual Crossing API.
@@ -262,7 +262,7 @@ Run `create_db.sh` to initialize the SQLite database. It executes:
 Run unit tests to ensure individual features work as expected:
 
 ```bash
-`pytest tests/`
+pytest tests/
 ```
 
 ### **Smoke Tests**
@@ -270,7 +270,7 @@ Run unit tests to ensure individual features work as expected:
 Run smoke tests to verify that critical features are operational:
 
 ```bash
-`bash smoketest.sh`
+bash smoketest.sh
 ```
 
 ---
