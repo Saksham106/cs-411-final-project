@@ -10,7 +10,7 @@ This Weather Application API is built using Flask. It allows users to:
 
 The API is containerized using Docker and stores user and location data in SQLite.
 
----
+
 
 ## **Setup Instructions**
 
@@ -23,25 +23,6 @@ The API is containerized using Docker and stores user and location data in SQLit
 2. **Run the Docker Container:**
     ```bash
     docker run -d -p 5002:5002 --env-file .env weather-app
-    ```
-
-### **Without Docker**
-
-1. **Install Dependencies:**
-    ```bash
-    pip install -r requirements.txt
-    ```
-2. **Set Up Environment Variables:** Create a `.env` file in the project directory with:
-    ```env
-    WEATHER_API_KEY=<your_visual_crossing_api_key>
-    ```
-3. **Set Up Environment Variables:** Create a `.env` file in the project directory with:**Initialize the Database:** Run the provided `create_db.sh` script:
-    ```bash
-    bash create_db.sh
-    ```
-4. **Run the Flask App:**
-    ```bash
-    python app.py
     ```
 
 ## Routes Documentation
@@ -60,7 +41,6 @@ The API is containerized using Docker and stores user and location data in SQLit
             }
             ```
 
----
 
 ### **/api/`<city>`**
 
@@ -85,7 +65,6 @@ The API is containerized using Docker and stores user and location data in SQLit
             }
             ```
 
----
 
 ### /api/`<city>`/current-conditions
 
@@ -102,8 +81,7 @@ The API is containerized using Docker and stores user and location data in SQLit
                 "precip": 0.1
             }
             ```
-
----
+            
 
 ### /api/`<city>`/week-average-temp
 
@@ -119,7 +97,6 @@ The API is containerized using Docker and stores user and location data in SQLit
             }
             ```
 
----
 
 ### /api/`<city>`/max-temp-day
 
@@ -136,7 +113,6 @@ The API is containerized using Docker and stores user and location data in SQLit
             }
             ```
 
----
 
 ### /api/`<city>`/min-temp-day
 
@@ -153,7 +129,6 @@ The API is containerized using Docker and stores user and location data in SQLit
             }
             ```
 
----
 
 ### /api/`<city>`/highest-precip-day
 
@@ -170,7 +145,6 @@ The API is containerized using Docker and stores user and location data in SQLit
             }
             ```
 
----
 
 ### **/api/create-account**
 
@@ -195,7 +169,6 @@ The API is containerized using Docker and stores user and location data in SQLit
             }
             ```
 
----
 
 ### **/api/login**
 
@@ -220,7 +193,6 @@ The API is containerized using Docker and stores user and location data in SQLit
             }
             ```
 
----
 
 ### **/api/update-password**
 
@@ -244,16 +216,6 @@ The API is containerized using Docker and stores user and location data in SQLit
             }
             ```
 
----
-
-## **Database Setup**
-
-Run `create_db.sh` to initialize the SQLite database. It executes:
-
--   `create_user_table.sql`: Creates the `users` table for user accounts.
--   `create_location_table.sql`: Creates the `locations` table for weather data.
-
----
 
 ## **Testing**
 
@@ -270,12 +232,12 @@ pytest tests/
 Run smoke tests to verify that critical features are operational:
 
 ```bash
-bash smoketest.sh
+sh smoketest.sh
 ```
 
----
 
-**Dependencies**
+
+## **Dependencies**
 
 -   **Python Libraries:**
     -   Flask
