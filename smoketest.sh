@@ -121,10 +121,16 @@ create_account() {
   response=$(curl -s -X POST "$BASE_URL/create-account" -H "Content-Type: application/json" \
     -d "{\"username\": \"$username\", \"password\": \"$password\"}")
   echo "Response: $response"
-  echo "$response" | grep -q '"message": "Account created successfully"' || {
+  message=$(echo "$response" | jq -r '.message')
+  error=$(echo "$response" | jq -r '.error')
+  if [ "$message" == "Account created successfully" ]; then
+    echo "Account created successfully for $username."
+  elif [ "$error" == "Username '$username' already exists" ]; then
+    echo "Username '$username' already exists. Skipping account creation."
+  else
     echo "Failed to create account for $username."
     exit 1
-  }
+  fi
 }
 
 login_user() {
@@ -134,10 +140,13 @@ login_user() {
   response=$(curl -s -X POST "$BASE_URL/login" -H "Content-Type: application/json" \
     -d "{\"username\": \"$username\", \"password\": \"$password\"}")
   echo "Response: $response"
-  echo "$response" | grep -q '"message": "Login successful"' || {
+  message=$(echo "$response" | jq -r '.message')
+  if [ "$message" == "Login successful" ]; then
+    echo "Login successful for $username."
+  else
     echo "Failed to log in user $username."
     exit 1
-  }
+  fi
 }
 
 update_password() {
@@ -148,10 +157,13 @@ update_password() {
   response=$(curl -s -X POST "$BASE_URL/update-password" -H "Content-Type: application/json" \
     -d "{\"username\": \"$username\", \"old_password\": \"$old_password\", \"new_password\": \"$new_password\"}")
   echo "Response: $response"
-  echo "$response" | grep -q '"message": "Password updated successfully"' || {
+  message=$(echo "$response" | jq -r '.message')
+  if [ "$message" == "Password updated successfully" ]; then
+    echo "Password updated successfully for $username."
+  else
     echo "Failed to update password for $username."
     exit 1
-  }
+  fi
 }
 
 
