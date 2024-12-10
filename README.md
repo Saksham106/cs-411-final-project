@@ -62,7 +62,7 @@ The API is containerized using Docker and stores user and location data in SQLit
 
 ---
 
-### **/api/<city>**
+### **/api/`<city>`**
 
 -   **Request Type:** `GET`
 -   **Purpose:** Fetches weather data for the specified city from the Visual Crossing API.
@@ -87,7 +87,7 @@ The API is containerized using Docker and stores user and location data in SQLit
 
 ---
 
-### /api/<city>/current-conditions
+### /api/`<city>`/current-conditions
 
 -   **Request Type:** `GET`
 -   **Purpose:** Retrieves current weather conditions for the city.
@@ -105,7 +105,7 @@ The API is containerized using Docker and stores user and location data in SQLit
 
 ---
 
-### /api/<city>/week-average-temp
+### /api/`<city>`/week-average-temp
 
 -   **Request Type:** `GET`
 -   **Purpose:** Calculates the weekly average temperature for the city.
@@ -121,7 +121,7 @@ The API is containerized using Docker and stores user and location data in SQLit
 
 ---
 
-### /api/<city>/max-temp-day
+### /api/`<city>`/max-temp-day
 
 -   **Request Type:** `GET`
 -   **Purpose:** Fetches the day with the highest maximum temperature.
@@ -138,7 +138,7 @@ The API is containerized using Docker and stores user and location data in SQLit
 
 ---
 
-### /api/<city>/min-temp-day
+### /api/`<city>`/min-temp-day
 
 -   **Request Type:** `GET`
 -   **Purpose:** Fetches the day with the lowest minimum temperature.
@@ -155,7 +155,7 @@ The API is containerized using Docker and stores user and location data in SQLit
 
 ---
 
-### /api/<city>/highest-precip-day
+### /api/`<city>`/highest-precip-day
 
 -   **Request Type:** `GET`
 -   **Purpose:** Fetches the day with the highest precipitation probability.
