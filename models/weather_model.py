@@ -52,13 +52,19 @@ def load_weather_data(city: str) -> dict:
         dict: The weather data dictionary loaded from file or retrieved from API.
     """
     filename = 'weather_data.json'
-    if not os.path.exists(filename) or os.path.getsize(filename) == 0:
-        data = fetch_weather_data(city)
-        write_data_to_json_file(data, filename)
-    else:
-        with open(filename, 'r') as f:
-            data = json.load(f)
+    if os.path.exists(filename) and os.path.getsize(filename) > 0:
+        try:
+            with open(filename, 'r') as f:
+                data = json.load(f)
+                if data:  # Ensure data is not empty or None
+                    return data
+        except json.JSONDecodeError:
+            pass  # Fall back to API if JSON is invalid
+    # Fetch data from the API if the file is missing, empty, or invalid
+    data = fetch_weather_data(city)
+    write_data_to_json_file(data, filename)
     return data
+
 
 def get_current_conditions(city: str) -> dict:
     """

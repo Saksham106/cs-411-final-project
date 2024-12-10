@@ -118,7 +118,9 @@ def healthcheck() -> Response:
         JSON response indicating the health status of the service.
     """
     app.logger.info('Health check')
-    return make_response(jsonify({'status': 'healthy'}), 200)
+    response = make_response(jsonify({"status": "healthy"}), 200)
+    app.logger.debug(f"Health Check Response: {response.get_data(as_text=True)}") 
+    return response  
 
 @app.route('/api/create-account', methods=['POST'])
 def create_account_route() -> Response:
