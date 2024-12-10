@@ -18,7 +18,7 @@ The API is containerized using Docker and stores user and location data in SQLit
 
 1. **Build the Docker Image:**
     ```bash
-    docker build -t weather-app
+    docker build -t weather-app .
     ```
 2. **Run the Docker Container:**
     ```bash
